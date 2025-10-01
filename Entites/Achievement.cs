@@ -1,6 +1,6 @@
 ﻿namespace Entites;
 
-public class Achievement
+public class Achievement : BaseEntity
 {
     public int RaceWins { get; set; }
     public int PolePosition { get; set; }
