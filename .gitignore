@@ -1,0 +1,50 @@
+# Build output
+bin/
+obj/
+out/
+Debug/
+Release/
+
+# Rider (JetBrains)
+.idea/
+*.iml
+
+# .NET
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+*.nuget
+packages/
+*.lock.json
+
+# Logs
+*.log
+logs/
+
+# Environment & secrets
+.env
+appsettings.*.json
+
+# Database (SSMS related)
+*.bak
+*.dbmdl
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.swp
+*.tmp
+*.tmp.*
+*.temp
