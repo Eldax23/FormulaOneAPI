@@ -1,4 +1,6 @@
 using DataService.Data;
+using DataService.Repositories;
+using DataService.Repositories.Implementation;
 using Microsoft.EntityFrameworkCore;
 
 namespace API;
@@ -13,6 +15,9 @@ public class Program
         builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
         // Add services to the container.
 
+        builder.Services.AddScoped<IUnitOfWork , UnitOfWork>();
+        
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
