@@ -9,8 +9,8 @@ namespace API.Controllers;
 
 public class BaseController : ControllerBase
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
+    protected readonly IUnitOfWork _unitOfWork;
+    protected readonly IMapper _mapper;
 
     public BaseController(IUnitOfWork  unitOfWork , IMapper mapper)
     {
