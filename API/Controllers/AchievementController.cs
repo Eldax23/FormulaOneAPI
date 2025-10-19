@@ -15,18 +15,20 @@ public class AchievementController : BaseController
     {
     }
 
-    [HttpGet("{driverId:guid}")]
-    public async Task<IActionResult> GetDriverAchievements(Guid driverId)
-    {
-        IEnumerable<Achievement>? driverAchievements = await _unitOfWork.Achievements.GetAllAsync();
-        
-        if(driverAchievements == null)
-            return NotFound("Achievements Not Found");
 
-        var res = _mapper.Map<DriverAchievementResponse>(driverAchievements);
+    [HttpGet("{achievementId:guid}")]
+    public async Task<IActionResult> GetAchievement(Guid achievementId)
+    {
+        Achievement? entity = await _unitOfWork.Achievements.GetAchievementById(achievementId);
+        if (entity == null)
+            return NotFound("No Achievement Found");
         
-        return Ok(res);
+        DriverAchievementResponse response = _mapper.Map<DriverAchievementResponse>(entity);
+        return Ok(response);
     }
+    
+    
+    
 
     [HttpPost]
     public async Task<IActionResult> AddAchievement([FromBody]CreateDriverAchievementRequest achievemnt)
@@ -40,7 +42,7 @@ public class AchievementController : BaseController
 
         await _unitOfWork.Achievements.AddAsync(res);
         await _unitOfWork.CompleteAsync();
-        return CreatedAtAction(nameof(GetDriverAchievements), new { id = res.DriverId }, res);
+        return CreatedAtAction(nameof(GetAchievement), new { achievementId = res.DriverId }, res);
         
     }
 

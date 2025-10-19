@@ -27,8 +27,20 @@ public class DriverController : BaseController
         IEnumerable<GetDriverResponse> res = _mapper.Map<IEnumerable<GetDriverResponse>>(drivers);
         return Ok(res);
     }
+    
+    // Get All Achievements for a driver
 
+    [HttpGet("{driverId:guid}/achievements")]
+    public async Task<IActionResult> GetDriverAchievements(Guid driverId)
+    {
+        IEnumerable<Achievement>? driverAchievements = await _unitOfWork.Achievements.GetAchievemntsForDriverAsync(driverId);
+        
+        if(driverAchievements == null)
+            return NotFound("Achievements Not Found");
 
+        IEnumerable<DriverAchievementResponse> res = _mapper.Map<IEnumerable<DriverAchievementResponse>>(driverAchievements);
+        return Ok(res);
+    }
 
     [HttpGet("{driverId:guid}")]
     public async Task<IActionResult> GetDriver(Guid driverId)

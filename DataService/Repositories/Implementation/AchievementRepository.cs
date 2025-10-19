@@ -11,12 +11,11 @@ public class AchievementRepository : GenericRepository<Achievement> , IAchieveme
     {
     }
 
-    public async Task<Achievement?> GetDriverAchievementByIdAsync(Guid id)
+    public async Task<Achievement?> GetAchievementById(Guid id)
     {
         try
         {
-            Achievement? result = await _dbSet.FirstOrDefaultAsync(a => a.DriverId == id);
-
+            Achievement? result = await _dbSet.FirstOrDefaultAsync(a => a.Id == id);
             return result;
         }
         catch (Exception ex)
@@ -55,6 +54,22 @@ public class AchievementRepository : GenericRepository<Achievement> , IAchieveme
         entity.Status = 0;
         entity.UpdatedAt = DateTime.UtcNow;
         return true;
+    }
+
+    public async Task<IEnumerable<Achievement>> GetAchievemntsForDriverAsync(Guid driverId)
+    {
+        try
+        {
+            return await _dbSet.Where(a => a.DriverId == driverId && a.Status == 1)
+                .AsNoTracking()
+                .OrderBy(a => a.CreatedAt)
+                .ToListAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message, e);
+            throw;
+        }
     }
 
     public override async Task<bool> UpdateAsync(Achievement entity)
