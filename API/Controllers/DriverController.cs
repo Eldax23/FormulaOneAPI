@@ -1,31 +1,35 @@
+using API.Commands.DriverRequests;
+using API.Queries.DriversQueries;
 using AutoMapper;
 using DataService.Repositories;
 using Entites;
 using Entites.Dtos.Requests;
 using Entites.Dtos.Responses;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-
 namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class DriverController : BaseController
 {
-    public DriverController(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+
+    public DriverController(IUnitOfWork unitOfWork, IMapper mapper , IMediator mediator) : base(unitOfWork, mapper , mediator)
     {
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAllDrivers()
     {
-        IEnumerable<Driver?> drivers = await _unitOfWork.Drivers.GetAllAsync();
-        if (drivers.IsNullOrEmpty())
-        {
-            return NotFound("No Drivers Found");
-        }
-        IEnumerable<GetDriverResponse> res = _mapper.Map<IEnumerable<GetDriverResponse>>(drivers);
-        return Ok(res);
+        // Specify the query that I have for this endpoint
+        var query = new GetAllDriversQuery();
+        
+        // the MediatR recognized the right handler based on the GetlAllDriversQuery which 
+        // we specified in the GetAllDriversHandler , yea i guess MediatR is smart enough to do that
+        var result = await _mediator.Send(query);
+        return Ok(result);
+
     }
     
     // Get All Achievements for a driver
@@ -45,12 +49,11 @@ public class DriverController : BaseController
     [HttpGet("{driverId:guid}")]
     public async Task<IActionResult> GetDriver(Guid driverId)
     {
-        Driver? driver = await _unitOfWork.Drivers.GetByIdAsync(driverId);
-        if(driver == null)
-            return NotFound("Driver not found");
-        
-        GetDriverResponse res = _mapper.Map<GetDriverResponse>(driver);
-        return Ok(res);
+        var query = new GetDriverQuery(driverId);
+        GetDriverResponse? result = await _mediator.Send(query);
+        if(result == null)
+            return NotFound("Driver Not Found");
+        return Ok(result);
     }
     
     
@@ -61,10 +64,9 @@ public class DriverController : BaseController
         {
             return BadRequest(ModelState);
         }
-        Driver entity = _mapper.Map<Driver>(driver);
-        await _unitOfWork.Drivers.AddAsync(entity);
-        await _unitOfWork.CompleteAsync();
-        return Ok(entity);
+        CreateDriverRequestInfo request = new  CreateDriverRequestInfo(driver);
+        GetDriverResponse? res = await _mediator.Send(request);
+        return CreatedAtAction(nameof(GetDriver), new { driverId = res.DriverId }, res);
     }
 
     [HttpPut]
@@ -75,9 +77,17 @@ public class DriverController : BaseController
         {
             return BadRequest(ModelState);
         }
-        Driver? entity = _mapper.Map<Driver>(driver);
-        await _unitOfWork.Drivers.UpdateAsync(entity);
-        await _unitOfWork.CompleteAsync();
-        return NoContent(); 
+
+        UpdateDriverInfoRequest command = new UpdateDriverInfoRequest(driver);
+        bool res = await _mediator.Send(command);
+        return res ?  NoContent() : BadRequest(); 
+    }
+
+    [HttpDelete("{driverId:guid}")]
+    public async Task<IActionResult> DeleteDriver(Guid driverId)
+    {
+        DeleteDriverRequestInfo command = new DeleteDriverRequestInfo(driverId);
+        bool res = await _mediator.Send(command);
+        return res ? NoContent() : BadRequest();
     }
 }

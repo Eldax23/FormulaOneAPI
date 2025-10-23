@@ -16,6 +16,9 @@ public class Program
         // Add services to the container.
 
         builder.Services.AddScoped<IUnitOfWork , UnitOfWork>();
+
+        // Injecting the MediatR Service
+        builder.Services.AddMediatR(conf => conf.RegisterServicesFromAssemblies(typeof(Program).Assembly));
         
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.AddControllers();

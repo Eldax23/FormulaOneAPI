@@ -3,6 +3,7 @@ using DataService.Repositories;
 using Entites;
 using Entites.Dtos.Requests;
 using Entites.Dtos.Responses;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -11,7 +12,7 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class AchievementController : BaseController
 {
-    public AchievementController(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+    public AchievementController(IUnitOfWork unitOfWork, IMapper mapper , IMediator mediator) : base(unitOfWork, mapper , mediator)
     {
     }
 
